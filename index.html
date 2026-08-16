@@ -336,6 +336,9 @@ h1.headline .b{color:var(--blue);display:block}
 .cb.act span{color:var(--t-1)}
 
 /* ordered field guide */
+.fg-rule{font-size:13px;line-height:1.65;color:var(--t-2);background:rgba(230,168,58,.09);
+  border:1px solid rgba(230,168,58,.25);border-radius:var(--r-md);padding:12px 15px;margin-bottom:14px}
+.fg-rule b{color:var(--t-1)}
 .steps{display:grid;gap:9px;counter-reset:s}
 .step{
   border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);
@@ -4051,10 +4054,113 @@ function srcLinks(s) {
   return out;
 }
 
+/* ============================================================
+   현장 점검 순서 — 파생 자료 (공식 원문 아님)
+   만드는 방법
+     · 공식 원인 목록을 그대로 쓰되, 현장에서 확인하기 쉬운 순서로 재배열한다.
+     · 문장은 원문 그대로다. 새 내용을 만들지 않는다.
+     · 순서 규칙: 도구 없이 눈으로 볼 수 있는 것 → 설정값 → 측정 → 운전조건 →
+                 환경 → 그 외 → 부품 교환(비용·시간이 크므로 마지막)
+     · 매뉴얼이 이미 점검 순서를 제공하면 재배열하지 않고 그대로 따른다.
+   ============================================================ */
+const FG_RULES = [
+  [1, '배선·접속',   /단선|접속|배선|커넥터|케이블|하네스|결선|풀림|조임|오배선|접촉\s?불량|분리되|빠져|헐거/],
+  [2, '설정·파라미터', /설정|파라미터|\[Pr\.|스위치|버전|소프트웨어|할당|모드|초기값|선택|프로그램/],
+  [3, '신호·통신',   /신호|통신|지령|검출|입력되|읽을 수 없|응답|타임\s?아웃|프로토콜|데이터/],
+  [4, '측정',       /전압|전류|저항|측정|모선|테스터|전원(?!\s?재투입)/],
+  [5, '운전조건·부하', /부하|과부하|속도|가감속|시정수|토크|추력|운전\s?패턴|티칭|재생|충돌|간섭|게인|회생|주파수|장착\s?방향|자세/],
+  [6, '환경·냉각',   /온도|냉각|팬|주위|환경|노이즈|열|먼지|습/],
+  [8, '부품 교환',   /고장|교환|교체|파손|손상|수명|열화/],
+];
+const FG_OTHER = 7;
+
+function fgRank(text) {
+  let best = FG_OTHER, label = '';
+  for (const [r, l, re] of FG_RULES) {
+    if (re.test(text) && r < best) { best = r; label = l; }
+  }
+  /* '고장' 만 걸린 문장은 마지막으로 보낸다 */
+  if (!label) { const m = FG_RULES.find(([, , re]) => re.test(text)); if (m) { best = m[0]; label = m[1]; } }
+  return { rank: best, label };
+}
+
+/** 알람 하나의 현장 점검 순서를 만든다. 근거가 없으면 null 을 돌려준다. */
+function deriveFieldGuide(a) {
+  /* 0) 직접 작성해 둔 것이 있으면 그것을 쓴다 */
+  if (a.fieldGuide && a.fieldGuide.diagnosticOrder.length) return a.fieldGuide;
+
+  /* 1) 매뉴얼이 이미 점검 순서를 주는 경우 — 재배열하지 않는다 */
+  const stepList = (a.officialLists || []).find((L) => L.kind === 'step');
+  if (stepList) {
+    return {
+      diagnosticOrder: stepList.items.slice(),
+      caution: `이 순서는 재배열한 것이 아니라 원문의 「${stepList.title}」 순서 그대로입니다.`,
+      kind: 'manual',
+    };
+  }
+
+  /* 2) 공식 원인 목록을 재배열한다 */
+  const src = [];
+  (a.causes || []).forEach((c, i) => { if (c.c) src.push({ t: c.c, i }); });
+  (a.officialLists || []).forEach((L) => {
+    if (L.kind === 'step') return;
+    L.items.forEach((x, i) => src.push({ t: x, i: src.length + i }));
+  });
+
+  /* 원인이 1건이면 재배열할 것이 없다. 원인과 조치를 그대로 두 단계로 보여준다. */
+  if (src.length === 1) {
+    const one = (a.causes || []).find((c) => c.c === src[0].t);
+    const steps = [src[0].t];
+    if (one && one.a) steps.push(one.a);
+    return {
+      diagnosticOrder: steps,
+      caution: '공식 원인이 1건이라 재배열할 것이 없습니다. 원문 그대로입니다.',
+      kind: 'single',
+    };
+  }
+
+  if (src.length >= 2) {
+    const ranked = src.map((x, i) => ({ ...x, ...fgRank(x.t), o: i }))
+      .sort((p, q) => (p.rank - q.rank) || (p.o - q.o));
+    return {
+      diagnosticOrder: ranked.map((x) => (x.label ? `[${x.label}] ${x.t}` : x.t)),
+      caution: '공식 원인 목록을 현장에서 확인하기 쉬운 순서로 재배열한 것입니다. 문장은 원문 그대로이며, 순서만 바꿨습니다. 원문 순서는 「공식 원인·대책」 탭에서 확인하십시오.',
+      kind: 'derived',
+    };
+  }
+
+  /* 3) 가와사키처럼 원인 목록이 없는 코드 — 매뉴얼의 구분 정의로 대응 순서를 만든다 */
+  if (a.code && typeof KAWA_CLASS !== 'undefined' && /^[PWED]\d{4}$/.test(a.code)) {
+    const m = KAWA_CLASS[a.code[0]];
+    if (m) {
+      const common = ['표시된 에러 번호와 메시지를 그대로 기록하십시오. 같은 번호가 다른 구분(P/W/E/D)에도 있습니다.',
+                      '메시지의 XX 자리에 표시된 실제 값(축 번호·보드 번호 등)을 확인하십시오.'];
+      const byClass = {
+        P: ['직전에 한 조작을 되짚어 보십시오. 로봇 동작에는 영향이 없는 조작 오류입니다.',
+            '입력값·프로그램·지령 형식을 다시 확인하십시오.'],
+        W: ['지금 당장 정지하지는 않지만 방치하면 에러가 됩니다. 원인을 찾아 두십시오.',
+            '같은 경고가 반복되는지 기록하십시오.'],
+        E: ['원인을 제거한 뒤 티치펜던트의 리셋으로 복구할 수 있습니다.',
+            '리셋 후에도 재발하면 원인이 남아 있는 것입니다. 반복 리셋하지 마십시오.'],
+        D: ['제어 전원을 OFF→ON 해야 해제됩니다. 리셋으로는 풀리지 않습니다.',
+            '하드웨어·소프트웨어의 중대한 문제입니다. 전원을 다시 넣기 전에 원인을 확인하십시오.'],
+      }[a.code[0]] || [];
+      return {
+        diagnosticOrder: [...common, ...byClass,
+          '해결되지 않으면 위 기록을 가지고 가와사키 기술지원에 문의하십시오.'],
+        caution: `이 코드는 매뉴얼 3.8절 해설이 없어 원인 목록이 없습니다. 위 순서는 매뉴얼 3.3·3.4절의 「${m.name}」 정의에서 끌어낸 일반 대응입니다. 코드별 원인이 아닙니다.`,
+        kind: 'class',
+      };
+    }
+  }
+  return null;
+}
+
 function renderAlarm(f, a) {
   const hasDiff = new Set(a.parameters.map((p) => p.models.join('|'))).size > 1;
   const hasCauses = a.causes.length > 0;
-  const hasGuide = a.fieldGuide.diagnosticOrder.length > 0;
+  const guide = deriveFieldGuide(a);
+  const hasGuide = !!guide;
   /* 원문이 '원인 목록'과 '처치 목록'을 따로 싣는 제조사용.
      둘을 1:1로 짝지으면 원문에 없는 대응관계를 만드는 셈이므로 목록 그대로 보여준다. */
   const lists = a.officialLists || [];
@@ -4157,12 +4263,16 @@ function renderAlarm(f, a) {
   </div>
 
   <div class="panel" data-p="3">
-    <span class="prov field">현장 점검 권장사항</span>
-    ${hasGuide ? `<div class="steps">
-        ${a.fieldGuide.diagnosticOrder.map((s) => `<div class="step"><i></i>${esc(s)}</div>`).join('')}
-      </div><div class="note">${esc(a.fieldGuide.caution)}</div>`
-    : `<div class="empty"><h3>현장 점검 가이드 미작성</h3>
-        <p>공식 원인 목록을 바탕으로 작성하는 영역입니다. 아직 작성되지 않았습니다.</p></div>`}
+    <span class="prov field">${guide && (guide.kind === 'manual' || guide.kind === 'single')
+      ? '공식 원문 순서' : '현장 점검 권장사항'}</span>
+    ${hasGuide ? `${guide.kind === 'derived' ? `<div class="fg-rule">확인하기 쉬운 것부터 —
+        <b>배선·접속 → 설정 → 신호 → 측정 → 운전조건 → 환경 → 부품 교환</b> 순으로 재배열했습니다.</div>` : ''}
+      <div class="steps">
+        ${guide.diagnosticOrder.map((s) => `<div class="step"><i></i>${esc(s)}</div>`).join('')}
+      </div><div class="note">${esc(guide.caution)}</div>`
+    : `<div class="empty"><h3>현장 점검 순서를 만들 근거가 없습니다</h3>
+        <p>이 코드는 공식 문서에 원인 목록이 없어, 점검 순서를 만들면 추측이 됩니다.<br>
+        <b>개요</b> 탭의 발생 조건을 확인하십시오.</p></div>`}
   </div>
 
   <div class="panel" data-p="4">
