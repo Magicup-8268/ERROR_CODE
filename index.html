@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="icons/pwa-192.png">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#061426">
@@ -306,7 +307,6 @@ h1.headline .b{color:var(--blue);display:block}
 }
 .prov.official{background:rgba(79,159,224,.15);color:#8FC7F0;border:1px solid rgba(79,159,224,.3)}
 .prov.field{background:rgba(232,185,58,.13);color:#EBCB74;border:1px solid rgba(232,185,58,.28)}
-.prov.user{background:rgba(63,191,143,.13);color:#6FD4AC;border:1px solid rgba(63,191,143,.28)}
 
 .kv{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel);overflow:hidden}
 .kv-row{display:grid;grid-template-columns:130px 1fr;gap:14px;padding:15px 18px;
@@ -459,8 +459,6 @@ h1.headline .b{color:var(--blue);display:block}
 .home.off,.detail.off{display:none}
 
 .authwrap{max-width:460px;margin:0 auto;padding:26px 0 0}
-.field{margin-top:16px}
-.field label{display:block;font-size:13px;font-weight:700;color:var(--t-3);margin-bottom:7px}
 .input,.textarea,.select{
   width:100%;background:rgba(255,255,255,.03);border:1px solid var(--line);
   border-radius:var(--r-md);padding:13px 15px;font-size:15px;font-weight:500;outline:none;transition:.18s
@@ -489,7 +487,6 @@ h1.headline .b{color:var(--blue);display:block}
 .toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 .toolbar .input,.toolbar .select{width:auto;flex:1 1 160px;padding:11px 13px;font-size:14px}
 
-.caselist{display:grid;gap:9px}
 .caseitem{
   border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);
   padding:15px 17px;display:flex;gap:13px;align-items:flex-start;text-align:left;width:100%;transition:.18s
@@ -505,30 +502,7 @@ h1.headline .b{color:var(--blue);display:block}
   border:1px solid rgba(79,159,224,.28);border-radius:7px;padding:4px 8px;flex:none
 }
 
-.photogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:9px;margin-top:10px}
-.photo{position:relative;border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--line);aspect-ratio:1}
-.photo img{width:100%;height:100%;object-fit:cover;display:block}
-.photo .rm{
-  position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:99px;
-  background:rgba(6,15,26,.82);color:#F0ADA5;font-size:14px;font-weight:800;display:grid;place-items:center
-}
-.photo .meta{
-  position:absolute;left:0;right:0;bottom:0;padding:5px 6px;font-size:9.5px;font-weight:700;
-  background:linear-gradient(180deg,transparent,rgba(4,11,21,.92));color:var(--t-2);text-align:center
-}
-.addphoto{
-  border:1px dashed var(--line);border-radius:var(--r-sm);aspect-ratio:1;display:grid;
-  place-items:center;color:var(--t-3);font-size:12.5px;font-weight:700;gap:4px;transition:.18s
-}
-.addphoto:hover{border-color:var(--blue);color:var(--t-2)}
 
-.audit{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel);overflow:hidden}
-.arow{display:grid;grid-template-columns:74px 1fr;gap:12px;padding:13px 17px;
-  border-bottom:1px solid var(--line-soft);font-size:13.5px;align-items:start}
-.arow:last-child{border-bottom:0}
-.arow .at{color:var(--t-3);font-weight:700;font-size:12px}
-.arow .aa{font-weight:700;font-size:11.5px;letter-spacing:.03em;color:#8FC7F0}
-.arow .as{color:var(--t-2);font-weight:500;margin-top:3px}
 
 .dbstate{display:flex;align-items:center;gap:11px;padding:16px 18px;border-radius:var(--r-md);
   border:1px solid var(--line);background:var(--panel);font-size:14.5px;font-weight:700}
@@ -538,11 +512,6 @@ h1.headline .b{color:var(--blue);display:block}
 .dbstate.off i{background:var(--t-3);box-shadow:0 0 0 4px rgba(110,134,159,.15)}
 .dbstate.bad i{background:var(--danger);box-shadow:0 0 0 4px rgba(232,104,93,.15)}
 
-.codeout{
-  margin-top:14px;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:var(--r-md);
-  padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
-  color:var(--t-2);white-space:pre-wrap;word-break:break-all;max-height:230px;overflow:auto;line-height:1.55
-}
 .hint{font-size:12.5px;color:var(--t-3);margin-top:8px;line-height:1.6}
 
 .admin-btn{
@@ -587,12 +556,12 @@ footer{
       <div class="brand-name">Magicup-Error-Code</div>
     </div>
     <div class="spacer"></div>
-    <button class="admin-btn" id="adminBtn" title="관리자" aria-label="관리자">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    <button class="admin-btn" id="adminBtn" title="설정" aria-label="설정">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg><span>관리자</span>
-    </button>
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+      </svg><span>설정</span></button>
   </div>
 </header>
 
@@ -962,7 +931,7 @@ function kawasakiFamily(id, ko, en, fullName, models, docRef, extra) {
              'E 시리즈 매뉴얼이 이 제품군에도 적용되는지 기술지원에 확인',
              '사내 보유 매뉴얼이 있으면 해당 부록 페이지 공유'],
     },
-    notice: '이 제품군은 공식 에러코드 DB가 아직 비어 있습니다. 검색하면 모두 미등록으로 표시되며, 관리자 화면에서 현장 사례는 지금도 기록할 수 있습니다.',
+    notice: '이 제품군은 공식 에러코드 DB가 아직 비어 있습니다. 검색하면 모두 미등록으로 표시됩니다. 공식 자료를 확보하면 이 자리에 채워집니다.',
     alarms: [],
   };
 }
@@ -3608,7 +3577,7 @@ const CATALOG = [
                '오브젝트 딕셔너리에서 0x603F Error code 와 0x50xx 에러/워닝 레지스터 확인',
                '웰콘에 ESI 파일(XML)과 WCS Drive API 문서 요청'],
       },
-      notice: '이 제품군은 공식 에러코드 DB가 아직 비어 있습니다. 검색하면 모두 미등록으로 표시되며, 관리자 화면에서 현장 사례는 지금도 기록할 수 있습니다.',
+      notice: '이 제품군은 공식 에러코드 DB가 아직 비어 있습니다. 검색하면 모두 미등록으로 표시됩니다. 공식 자료를 확보하면 이 자리에 채워집니다.',
       alarms: [],
       source: WELCON_SOURCE,
     }],
@@ -3869,8 +3838,6 @@ function paintHome() {
       <div class="cp">${esc(f.codeFormat === 'robotis-bitflag' ? '확인된 비트만' : '공식 원문 확인')}</div></div>
     <div class="stat"><div class="lb">대상 모델</div><div class="nm">${f.models.length}</div>
       <div class="cp">${esc(f.en)}</div></div>
-    <div class="stat"><div class="lb">현장 사례</div><div class="nm">${(store?.cases || []).length}</div>
-      <div class="cp">이 기기에만 저장</div></div>
     <div class="stat"><div class="lb">최근 검색</div><div class="nm">${list.length}</div>
       <div class="cp">최대 5개까지</div></div>`;
 
@@ -3955,8 +3922,7 @@ function renderNotFound(f, code) {
       : `<p>형식은 올바르지만 <b>현재 등록된 공식 DB에서 확인되지 않습니다.</b></p>
          <div class="sub">${esc(f.fullName)} · ${esc(f.dbVersionLabel)}</div>`}
     <div class="btnrow" style="justify-content:center">
-      <button class="btn btn-line" onclick="goHome()">다른 코드 검색</button>
-      <button class="btn btn-primary" onclick="paintAdmin()">이 코드로 현장 사례 기록</button>
+      <button class="btn btn-primary" onclick="goHome()">다른 코드 검색</button>
     </div>
   </div>
   ${cls ? `<div class="kv" style="margin-top:8px">
@@ -3964,8 +3930,7 @@ function renderNotFound(f, code) {
     <div class="kv-row"><div class="k">뜻</div><div class="v">${esc(cls.desc)}</div></div>
     ${f.notice ? `<div class="kv-row"><div class="k">확인 방법</div><div class="v">${esc(f.notice)}</div></div>` : ''}
   </div>` : ''}
-  ${emptyDb ? `<div class="sec-label" style="margin-top:34px">이 코드의 현장 사례</div>
-    ${detailCasesHtml(code)}` : ''}`;
+`;
 }
 
 function renderParent(code, children, anyClass) {
@@ -4126,7 +4091,7 @@ function renderAlarm(f, a) {
   </div>
 
   <div class="tabbar" role="tablist">
-    ${['개요','공식 원인·대책','원문 페이지','현장 점검','관련 파라미터','현장 사례','출처']
+    ${['개요','공식 원인·대책','원문 페이지','현장 점검','관련 파라미터','출처']
       .map((t, i) => `<button class="tab" role="tab" data-i="${i}" aria-selected="${i === 0}">${t}</button>`).join('')}
   </div>
 
@@ -4206,11 +4171,6 @@ function renderAlarm(f, a) {
   </div>
 
   <div class="panel" data-p="5">
-    <span class="prov user">사용자 현장 사례</span>
-    ${detailCasesHtml(a.code)}
-  </div>
-
-  <div class="panel" data-p="6">
     <span class="prov official">${esc(f.fullName)} 공식자료</span>
     <div class="kv">
       ${srcRows(a.source).map((r) => `<div class="kv-row">
@@ -4232,36 +4192,6 @@ function renderAlarm(f, a) {
          원문은 <b>원문 페이지</b> 탭에서 이미지로 보십시오.</div>`) : ''}
     <div class="caution"><b>검증 상태</b> · ${esc(a.source.note)}</div>
   </div>`;
-}
-
-/** 상세화면 '현장 사례' 탭 — 관리자가 이 기기에 저장한 USER 데이터만 표시 */
-function detailCasesHtml(code) {
-  const list = (typeof store !== 'undefined' ? store.cases : []).filter((c) => c.alarmCode === code);
-  if (!list.length) return `<div class="empty">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-           stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
-        <path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
-      <h3>등록된 현장 사례가 없습니다</h3>
-      <p>이 기기에 저장된 사례만 표시됩니다. 사례는 공식 자료와 분리되어 관리됩니다.</p>
-      <button class="btn-ghost" onclick="paintAdmin()">관리자로 사례 추가</button>
-    </div>`;
-  return list.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).map((c) => {
-    const ph = store.photos[c.id] || [];
-    return `<div class="cause">
-      <div class="cause-h"><div class="cause-n">${esc(c.result ? '✓' : '·')}</div>
-        <div class="cause-t">${esc(c.title || '(제목 없음)')}</div></div>
-      <div class="cause-b">
-        ${c.symptom ? `<div class="cb"><b>증상</b><span>${esc(c.symptom)}</span></div>` : ''}
-        ${c.actualCause ? `<div class="cb"><b>실제원인</b><span>${esc(c.actualCause)}</span></div>` : ''}
-        ${c.action ? `<div class="cb act"><b>조치</b><span>${esc(c.action)}</span></div>` : ''}
-        ${c.result ? `<div class="cb"><b>결과</b><span>${esc(c.result)}</span></div>` : ''}
-        ${c.notes ? `<div class="cb"><b>메모</b><span>${esc(c.notes)}</span></div>` : ''}
-      </div>
-      ${ph.length ? `<div class="photogrid" style="margin-top:12px">${ph.map((p) =>
-        `<div class="photo"><img src="${p.url}" alt=""><div class="meta">${p.width}×${p.height}</div></div>`).join('')}</div>` : ''}
-      <div class="hint">수정 ${esc(c.updatedAt)}</div>
-    </div>`;
-  }).join('');
 }
 
 function renderParams(a) {
@@ -4407,277 +4337,22 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
 window.goHome = goHome; window.run = run; window.gotoTab = gotoTab;
 
 /* ============================================================
-   4) 관리자 영역
-      · 프로토타입이므로 모든 데이터는 메모리에만 존재한다(새로고침 시 초기화).
-      · 실제 구현에서는 Dexie/IndexedDB에 저장한다.
+   4) 설정 화면 — 공식 DB 관리
+      현장 사례 기능은 제거했다. 이 앱은 공식 자료 조회 전용이다.
+      비밀번호도 두지 않는다. 지켜야 할 개인 데이터가 없기 때문이다.
    ============================================================ */
-const ADMIN_NOTICE =
-  '관리자 비밀번호는 이 기기의 편집 기능을 잠그기 위한 로컬 보호수단입니다. 서버 계정 인증을 대체하지 않습니다.';
+const store = { dbState: 'cur', lastCheck: '오늘 08:12', msg: null };
 
-const store = {
-  pwHash:null, pwSalt:null,        // 원문은 저장하지 않는다
-  cases:[], photos:{}, audit:[],
-  authed:false, tab:0, editing:null, msg:null,
-  dbState:'cur', lastCheck:'오늘 08:12'
-};
-
-const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
-const hasCrypto = !!(window.crypto && crypto.subtle && crypto.getRandomValues);
-
-async function derive(pw, saltBytes){
-  if(!hasCrypto) return 'nocrypto:' + pw;         // file:// 등 미지원 환경 폴백
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits(
-    {name:'PBKDF2', salt:saltBytes, iterations:600000, hash:'SHA-256'}, key, 256);
-  return b64(bits);
-}
-function newSalt(){
-  if(!hasCrypto) return new Uint8Array(16);
-  return crypto.getRandomValues(new Uint8Array(16));
-}
-const uid = () => (hasCrypto && crypto.randomUUID) ? crypto.randomUUID()
-  : 'id-' + Math.floor(performance.now()*1000).toString(36);
-
-function stamp(){
-  const d=new Date(), p=n=>String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-function audit(entityType, action, summary){
-  store.audit.unshift({id:uid(), entityType, action, at:stamp(), summary});
-}
-
-/* ---------- 사진 압축 (긴 변 1600px, WebP 우선 / JPEG 폴백) ---------- */
-async function compressPhoto(file){
-  let bmp;
-  if (window.createImageBitmap) bmp = await createImageBitmap(file);
-  else bmp = await new Promise((res,rej)=>{
-    const img=new Image(); img.onload=()=>res(img); img.onerror=rej; img.src=URL.createObjectURL(file);
-  });
-  const w0 = bmp.width, h0 = bmp.height;
-  const scale = Math.min(1, 1600 / Math.max(w0, h0));
-  const w = Math.round(w0*scale), h = Math.round(h0*scale);
-  const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
-  cv.getContext('2d').drawImage(bmp, 0, 0, w, h);
-
-  let blob = await new Promise(r=>cv.toBlob(r,'image/webp',0.82));
-  let mime = 'image/webp';
-  if(!blob || blob.type !== 'image/webp'){
-    blob = await new Promise(r=>cv.toBlob(r,'image/jpeg',0.85));
-    mime = 'image/jpeg';
-  }
-  return {blob, width:w, height:h, mimeType:mime, url:URL.createObjectURL(blob), bytes:blob.size};
-}
-
-/* ---------- 렌더 ---------- */
-const adminBack = `<button class="back" onclick="goHome()">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-       stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>검색으로</button>`;
-
-function msgHtml(){
-  if(!store.msg) return '';
+function msgHtml() {
+  if (!store.msg) return '';
   const m = store.msg; store.msg = null;
   return `<div class="msg ${m.k}">${esc(m.t)}</div>`;
 }
 
-function renderAuth(){
-  const first = store.pwHash === null;
-  return `${adminBack}
-  <div class="authwrap">
-    <div class="eyebrow" style="margin-bottom:16px"><i></i><span>Administrator</span></div>
-    <h1 class="headline" style="font-size:clamp(28px,7vw,40px)">
-      ${first ? '관리자 비밀번호<span class="b">설정이 필요합니다.</span>'
-              : '관리자 전용<span class="b">영역입니다.</span>'}</h1>
-    <form id="authForm" style="margin-top:26px">
-      <div class="field">
-        <label for="pw">${first ? '새 비밀번호' : '비밀번호'}</label>
-        <input class="input" type="password" id="pw" autocomplete="off" placeholder="••••••••">
-      </div>
-      ${first ? `<div class="field"><label for="pw2">비밀번호 확인</label>
-        <input class="input" type="password" id="pw2" autocomplete="off" placeholder="••••••••"></div>` : ''}
-      <div class="btnrow"><button class="btn btn-primary btn-full" type="submit">
-        ${first ? '비밀번호 설정하고 진입' : '관리자 진입'}</button></div>
-    </form>
-    ${msgHtml()}
-    <div class="msg info" style="margin-top:20px">${esc(ADMIN_NOTICE)}</div>
-    ${hasCrypto ? `<div class="hint">PBKDF2-HMAC-SHA256 · 600,000회 · 16바이트 랜덤 salt로 파생합니다. 원문은 저장하지 않습니다.</div>`
-                : `<div class="hint">이 환경에서는 Web Crypto를 쓸 수 없어 프로토타입 폴백으로 동작합니다.</div>`}
-  </div>`;
-}
-
-const ADMIN_TABS = ['현장 사례','이력','백업·복원','공식 DB','비밀번호'];
-
-function renderAdmin(){
-  return `${adminBack}
-  <div class="code-head">
-    <div class="code-badge">Administrator</div>
-    <div class="code-no" style="font-size:clamp(26px,6.4vw,36px)">관리자</div>
-    <div class="code-en" style="font-style:normal">현장 사례와 로컬 데이터를 관리합니다</div>
-  </div>
-  <div class="btnrow" style="margin-top:14px">
-    <button class="btn btn-line" onclick="adminLogout()">잠그기</button>
-  </div>
-  <div class="tabbar" role="tablist">
-    ${ADMIN_TABS.map((t,i)=>`<button class="tab" role="tab" data-i="${i}"
-        aria-selected="${i===store.tab}" onclick="adminTab(${i})">${t}</button>`).join('')}
-  </div>
-  <div style="padding-top:24px">${[panelCases,panelAudit,panelBackup,panelDb,panelPw][store.tab]()}</div>`;
-}
-
-/* --- 1) 현장 사례 --- */
-let filterQ='', filterCode='';
-function panelCases(){
-  if(store.editing) return editorHtml(store.editing);
-  const codes = [...new Set(store.cases.map(c=>c.alarmCode))];
-  const list = store.cases
-    .filter(c=>!filterCode || c.alarmCode===filterCode)
-    .filter(c=>{
-      if(!filterQ) return true;
-      const q=filterQ.toLowerCase();
-      return [c.title,c.symptom,c.actualCause,c.action].join(' ').toLowerCase().includes(q);
-    })
-    .sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
-
-  return `<span class="prov user">사용자 현장 사례</span>
-  ${msgHtml()}
-  <div class="toolbar">
-    <input class="input" id="fq" placeholder="제목·증상·원인·조치 검색" value="${esc(filterQ)}">
-    <select class="select" id="fc" style="flex:0 1 170px">
-      <option value="">전체 코드</option>
-      ${codes.map(c=>`<option value="${esc(c)}" ${c===filterCode?'selected':''}>${esc(c)}</option>`).join('')}
-    </select>
-    <button class="btn btn-primary" onclick="newCase()">+ 새 사례</button>
-  </div>
-  ${list.length ? `<div class="caselist">${list.map(c=>`
-    <button class="caseitem" onclick="editCase('${c.id}')">
-      <span class="ci-code">${esc(c.alarmCode)}</span>
-      <span class="ci-main">
-        <span class="ci-t">${esc(c.title||'(제목 없음)')}</span>
-        <span class="ci-s">${esc(c.symptom||'증상 미입력')}</span>
-        <span class="ci-m">수정 ${esc(c.updatedAt)} · 사진 ${(store.photos[c.id]||[]).length}장</span>
-      </span>
-    </button>`).join('')}</div>`
-  : `<div class="empty">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-           stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
-           <path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
-      <h3>${store.cases.length ? '조건에 맞는 사례가 없습니다' : '등록된 현장 사례가 없습니다'}</h3>
-      <p>사례는 이 기기에만 저장되며 공식 DB와 분리됩니다.</p>
-      <button class="btn-ghost" onclick="newCase()">첫 사례 추가</button></div>`}`;
-}
-
-function editorHtml(c){
-  const ph = store.photos[c.id] || [];
-  return `<span class="prov user">사용자 현장 사례</span>
-  ${msgHtml()}
-  <div class="field"><label for="e_code">연결 에러코드</label>
-    <input class="input" id="e_code" value="${esc(c.alarmCode)}" placeholder="예: 52.1"></div>
-  <div class="field"><label for="e_title">제목</label>
-    <input class="input" id="e_title" value="${esc(c.title)}" placeholder="예: 3호기 X축 알람 반복"></div>
-  <div class="field"><label for="e_sym">증상</label>
-    <textarea class="textarea" id="e_sym" placeholder="언제 어떻게 발생했는지">${esc(c.symptom)}</textarea></div>
-  <div class="field"><label for="e_cause">실제 원인</label>
-    <textarea class="textarea" id="e_cause">${esc(c.actualCause)}</textarea></div>
-  <div class="field"><label for="e_act">조치 내용</label>
-    <textarea class="textarea" id="e_act">${esc(c.action)}</textarea></div>
-  <div class="field"><label for="e_res">조치 결과</label>
-    <input class="input" id="e_res" value="${esc(c.result)}"></div>
-  <div class="field"><label for="e_note">메모</label>
-    <textarea class="textarea" id="e_note">${esc(c.notes)}</textarea></div>
-
-  <div class="field">
-    <label>사진 (${ph.length}/5) · 긴 변 1600px 자동 압축, WebP 우선</label>
-    <div class="photogrid">
-      ${ph.map((p,i)=>`<div class="photo">
-        <img src="${p.url}" alt="">
-        <button class="rm" onclick="rmPhoto(${i})" aria-label="사진 삭제">×</button>
-        <div class="meta">${p.width}×${p.height} · ${(p.bytes/1024).toFixed(0)}KB</div>
-      </div>`).join('')}
-      ${ph.length<5 ? `<button class="addphoto" onclick="document.getElementById('pf').click()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>추가</button>` : ''}
-    </div>
-    <input type="file" id="pf" accept="image/*" multiple hidden>
-    <div class="hint">6번째 사진은 차단됩니다. 원본은 저장하지 않고 압축본만 보관합니다.</div>
-  </div>
-
-  <div class="btnrow">
-    <button class="btn btn-primary" onclick="saveCase()">저장</button>
-    <button class="btn btn-line" onclick="cancelCase()">취소</button>
-    ${c.isNew ? '' : `<button class="btn btn-danger" onclick="delCase()">삭제</button>`}
-  </div>`;
-}
-
-/* --- 2) 이력 --- */
-function panelAudit(){
-  const rows = store.audit.slice(0,50);
-  if(!rows.length) return `<div class="empty"><h3>기록된 변경 이력이 없습니다</h3>
-    <p>사례 생성·수정·삭제, 복원, 비밀번호 변경, 공식 DB 갱신이 여기에 남습니다.</p></div>`;
-  return `<div class="audit">${rows.map(a=>`<div class="arow">
-    <div class="at">${esc(a.at)}</div>
-    <div><div class="aa">${esc(a.entityType)} · ${esc(a.action)}</div>
-    <div class="as">${esc(a.summary)}</div></div></div>`).join('')}</div>
-  <div class="hint">최근 50건까지 표시합니다.</div>`;
-}
-
-/* --- 3) 백업/복원 --- */
-function panelBackup(){
-  return `${msgHtml()}
-  <div class="msg info">USER 데이터만 백업합니다. 공식 Mitsubishi DB는 GitHub에서 다시 받을 수 있으므로 포함하지 않습니다.</div>
-  <div class="btnrow">
-    <button class="btn btn-line" onclick="doBackup(false)">일반 JSON 백업</button>
-    <button class="btn btn-primary" onclick="doBackup(true)">암호화 백업</button>
-    <button class="btn btn-line" onclick="document.getElementById('rf').click()">백업 파일 복원</button>
-  </div>
-  <input type="file" id="rf" accept=".json" hidden>
-  <div class="hint">암호화 백업은 관리자 비밀번호로 PBKDF2 → AES-GCM 키를 파생합니다.
-    비밀번호를 바꾸면 이전 백업은 복호화할 수 없습니다.</div>
-  <div id="bkout"></div>`;
-}
-
-/* --- 4) 공식 DB --- */
-function panelDb(){
-  const S = {
-    cur:['cur','최신 DB 사용 중'],
-    new:['new','새 공식 DB 사용 가능'],
-    off:['off','오프라인 · 현재 로컬 DB 유지'],
-    bad:['bad','업데이트 검증 실패 · 기존 DB 유지']
-  }[store.dbState];
-  return `${msgHtml()}
-  <div class="dbstate ${S[0]}"><i></i>${esc(S[1])}</div>
-  <div class="kv" style="margin-top:14px">
-    <div class="kv-row"><div class="k">현재 제품군</div><div class="v">${esc(fam() ? fam().fullName : '-')}</div></div>
-    <div class="kv-row"><div class="k">현재 버전</div><div class="v">${esc(fam() ? fam().dbVersionLabel : '-')}</div></div>
-    <div class="kv-row"><div class="k">packageVersion</div><div class="v">1</div></div>
-    <div class="kv-row"><div class="k">마지막 확인</div><div class="v">${esc(store.lastCheck)}</div></div>
-  </div>
-  <div class="btnrow">
-    <button class="btn btn-primary" onclick="checkDb()">최신 DB 확인</button>
-    <button class="btn btn-line" onclick="document.getElementById('df').click()">공식 DB 파일 가져오기</button>
-  </div>
-  <input type="file" id="df" accept=".json" hidden>
-  <div class="hint">검증에 실패한 패키지는 거부하고 기존 DB를 그대로 유지합니다.
-    공식 데이터는 관리자도 앱 안에서 수정할 수 없습니다.</div>
-
-  <div class="sec-label" style="margin-top:30px">원문 페이지 오프라인 저장</div>
-  <div class="kv">
-    <div class="kv-row"><div class="k">대상</div><div class="v">가와사키 304쪽 · 현대 Hi7 209쪽 = ${PAGE_TOTAL}쪽</div></div>
-    <div class="kv-row"><div class="k">용량</div><div class="v">약 ${PAGE_MB}MB</div></div>
-    <div class="kv-row"><div class="k">현재 저장</div><div class="v" id="pgSaved">확인 중…</div></div>
-  </div>
-  <div class="btnrow">
-    <button class="btn btn-primary" id="pgGet">원문 전체 내려받기</button>
-    <button class="btn btn-line" id="pgClear">저장된 원문 삭제</button>
-  </div>
-  <div id="pgProg" class="hint"></div>
-  <div class="hint">기본 설치에는 원문 이미지가 포함되지 않습니다. 현장에서 데이터로 ${PAGE_MB}MB 를
-    받게 하지 않기 위해서입니다. <b>Wi-Fi 에서 한 번</b> 받아 두면 이후에는 네트워크 없이 열립니다.
-    본 페이지는 받지 않아도 자동으로 남습니다.</div>`;
-}
-
-/* 원문 페이지 전체 목록 — 서비스워커에 넘길 URL */
-const PAGE_SETS = [['pages/kawa', 304], ['pages/hi7', 209]];
+/* 원문 페이지 — 서비스워커에 넘길 URL */
+const PAGE_SETS = [['pages/j5', 312], ['pages/j5ts', 114], ['pages/kawa', 304], ['pages/hi7', 209]];
 const PAGE_TOTAL = PAGE_SETS.reduce((s, [, n]) => s + n, 0);
-const PAGE_MB = 33;
+const PAGE_MB = 64;
 function allPageUrls() {
   const out = [];
   PAGE_SETS.forEach(([dir, n]) => {
@@ -4687,247 +4362,95 @@ function allPageUrls() {
 }
 async function savedPageCount() {
   if (!('caches' in window)) return null;
-  try {
-    const c = await caches.open('magicup-pages-v1');
-    return (await c.keys()).length;
-  } catch (e) { return null; }
+  try { return (await (await caches.open('magicup-pages-v1')).keys()).length; }
+  catch (e) { return null; }
 }
 
-/* --- 5) 비밀번호 --- */
-function panelPw(){
-  return `${msgHtml()}
-  <form id="pwForm" style="max-width:460px">
-    <div class="field"><label for="cur">현재 비밀번호</label>
-      <input class="input" type="password" id="cur" autocomplete="off"></div>
-    <div class="field"><label for="nw">새 비밀번호</label>
-      <input class="input" type="password" id="nw" autocomplete="off"></div>
-    <div class="field"><label for="nw2">새 비밀번호 확인</label>
-      <input class="input" type="password" id="nw2" autocomplete="off"></div>
-    <div class="btnrow"><button class="btn btn-primary" type="submit">비밀번호 변경</button></div>
-  </form>
-  <div class="msg info" style="margin-top:20px">${esc(ADMIN_NOTICE)}</div>`;
+function renderSettings() {
+  const S = {
+    cur: ['cur', '최신 DB 사용 중'],
+    new: ['new', '새 공식 DB 사용 가능'],
+    off: ['off', '오프라인 · 현재 로컬 DB 유지'],
+    bad: ['bad', '업데이트 검증 실패 · 기존 DB 유지'],
+  }[store.dbState];
+  const f = fam();
+  const total = CATALOG.reduce((s, m) => s + (m.families || []).reduce((t, x) => t + (x.alarms || []).length, 0), 0);
+
+  return `<div class="wrap">
+    <button class="back" onclick="goHome()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+           stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>검색으로</button>
+
+    <div class="code-head"><div class="code-no" style="font-size:30px">설정</div>
+      <div class="code-ko">공식 DB 와 원문 페이지를 관리합니다</div></div>
+
+    ${msgHtml()}
+
+    <div class="sec-label" style="margin-top:26px">공식 DB</div>
+    <div class="dbstate ${S[0]}"><i></i>${esc(S[1])}</div>
+    <div class="kv" style="margin-top:14px">
+      <div class="kv-row"><div class="k">전체 등록 코드</div><div class="v"><b>${total.toLocaleString('ko-KR')}건</b></div></div>
+      <div class="kv-row"><div class="k">현재 제품군</div><div class="v">${esc(f ? f.fullName : '-')}</div></div>
+      <div class="kv-row"><div class="k">현재 버전</div><div class="v">${esc(f ? f.dbVersionLabel : '-')}</div></div>
+      <div class="kv-row"><div class="k">마지막 확인</div><div class="v">${esc(store.lastCheck)}</div></div>
+    </div>
+    <div class="btnrow">
+      <button class="btn btn-primary" onclick="checkDb()">최신 DB 확인</button>
+    </div>
+    <div class="hint">공식 데이터는 앱 안에서 수정할 수 없습니다.
+      검증에 실패한 패키지는 거부하고 기존 DB를 그대로 유지합니다.</div>
+
+    <div class="sec-label" style="margin-top:34px">원문 페이지 오프라인 저장</div>
+    <div class="kv">
+      <div class="kv-row"><div class="k">대상</div><div class="v">미쓰비시 426쪽 · 가와사키 304쪽 · 현대 209쪽 = ${PAGE_TOTAL}쪽</div></div>
+      <div class="kv-row"><div class="k">용량</div><div class="v">약 ${PAGE_MB}MB</div></div>
+      <div class="kv-row"><div class="k">현재 저장</div><div class="v" id="pgSaved">확인 중…</div></div>
+    </div>
+    <div class="btnrow">
+      <button class="btn btn-primary" id="pgGet">원문 전체 내려받기</button>
+      <button class="btn btn-line" id="pgClear">저장된 원문 삭제</button>
+    </div>
+    <div id="pgProg" class="hint"></div>
+    <div class="hint">기본 설치에는 원문 이미지가 들어 있지 않습니다. 현장에서 데이터로 ${PAGE_MB}MB 를
+      받게 하지 않기 위해서입니다. <b>Wi-Fi 에서 한 번</b> 받아 두면 이후에는 네트워크 없이 열립니다.
+      받지 않아도 한 번 본 쪽은 자동으로 남습니다.</div>
+  </div>`;
 }
 
-/* ---------- 동작 ---------- */
-/** 편집 중 입력값이 재렌더로 날아가지 않게 DOM → store.editing 으로 먼저 옮긴다. */
-function syncEditor(){
-  if(!store.editing) return;
-  const map = {e_code:'alarmCode', e_title:'title', e_sym:'symptom', e_cause:'actualCause',
-               e_act:'action', e_res:'result', e_note:'notes'};
-  for(const [id,key] of Object.entries(map)){
-    const n = document.getElementById(id);
-    if(n) store.editing[key] = n.value;
-  }
-}
-
-function paintAdmin(){
-  syncEditor();
-  goAdmin(store.authed ? renderAdmin() : renderAuth());
-  bindAdmin();
-}
-
-function bindAdmin(){
-  const af = document.getElementById('authForm');
-  if(af) af.onsubmit = async e => {
-    e.preventDefault();
-    const pw = document.getElementById('pw').value;
-    if(store.pwHash === null){
-      const pw2 = document.getElementById('pw2').value;
-      if(pw.length < 4){ store.msg={k:'err',t:'비밀번호는 4자 이상 입력해 주세요.'}; return paintAdmin(); }
-      if(pw !== pw2){ store.msg={k:'err',t:'두 비밀번호가 일치하지 않습니다.'}; return paintAdmin(); }
-      store.pwSalt = newSalt();
-      store.pwHash = await derive(pw, store.pwSalt);
-      store.authed = true;
-      audit('settings','change-password','관리자 비밀번호 최초 설정');
-      store.msg = {k:'ok',t:'비밀번호를 설정했습니다.'};
-      return paintAdmin();
-    }
-    const h = await derive(pw, store.pwSalt);
-    if(h !== store.pwHash){ store.msg={k:'err',t:'비밀번호가 올바르지 않습니다.'}; return paintAdmin(); }
-    store.authed = true; paintAdmin();
-  };
-
-  const fq = document.getElementById('fq');
-  if(fq) fq.oninput = () => { filterQ = fq.value; const p=fq.selectionStart;
-    paintAdmin(); const n=document.getElementById('fq'); n.focus(); n.setSelectionRange(p,p); };
-  const fc = document.getElementById('fc');
-  if(fc) fc.onchange = () => { filterCode = fc.value; paintAdmin(); };
-
+function paintSettings() {
+  goAdmin(renderSettings());
   const saved = document.getElementById('pgSaved');
-  if (saved) {
-    savedPageCount().then((n) => {
-      saved.textContent = n === null ? '이 브라우저는 오프라인 저장을 지원하지 않습니다'
-        : `${n} / ${PAGE_TOTAL}쪽`;
-    });
-    document.getElementById('pgGet').onclick = () => {
-      const sw = navigator.serviceWorker?.controller;
-      const box = document.getElementById('pgProg');
-      if (!sw) { box.textContent = '서비스워커가 아직 준비되지 않았습니다. 배포본(GitHub Pages)에서만 동작합니다.'; return; }
-      box.textContent = '내려받는 중… 0 / ' + PAGE_TOTAL;
-      sw.postMessage({ type: 'PRECACHE_PAGES', urls: allPageUrls().map((u) => new URL(u, location.href).href) });
-    };
-    document.getElementById('pgClear').onclick = async () => {
-      if (!('caches' in window)) return;
-      await caches.delete('magicup-pages-v1');
-      audit('settings','clear-pages','저장된 원문 페이지 이미지 삭제');
-      paintAdmin();
-    };
-  }
-
-  const pf = document.getElementById('pf');
-  if(pf) pf.onchange = async () => {
-    const c = store.editing; const cur = store.photos[c.id] || [];
-    for(const f of [...pf.files]){
-      if((store.photos[c.id]||[]).length >= 5){
-        store.msg = {k:'err',t:'사진은 현장 사례당 최대 5장까지 등록할 수 있습니다.'};
-        break;
-      }
-      try{
-        const p = await compressPhoto(f);
-        store.photos[c.id] = [...(store.photos[c.id]||cur), p];
-      }catch(err){ store.msg = {k:'err',t:'이미지를 처리할 수 없습니다: ' + err.message}; }
-    }
-    paintAdmin();
+  if (!saved) return;
+  savedPageCount().then((n) => {
+    saved.textContent = n === null ? '이 브라우저는 오프라인 저장을 지원하지 않습니다' : `${n} / ${PAGE_TOTAL}쪽`;
+  });
+  document.getElementById('pgGet').onclick = () => {
+    const sw = navigator.serviceWorker?.controller;
+    const box = document.getElementById('pgProg');
+    if (!sw) { box.textContent = '오프라인 저장은 배포본(웹 주소로 연 경우)에서만 동작합니다.'; return; }
+    box.textContent = `내려받는 중… 0 / ${PAGE_TOTAL}`;
+    sw.postMessage({ type: 'PRECACHE_PAGES', urls: allPageUrls().map((u) => new URL(u, location.href).href) });
   };
-
-  const rf = document.getElementById('rf');
-  if(rf) rf.onchange = async () => {
-    const f = rf.files[0]; if(!f) return;
-    try{
-      const data = JSON.parse(await f.text());
-      if(data.format === 'mrj5-user-backup-encrypted'){
-        store.msg = {k:'info',t:'암호화 백업을 감지했습니다. 실제 구현에서는 여기서 비밀번호를 다시 확인합니다.'};
-      }else if(data.format === 'mrj5-user-backup'){
-        store.cases = data.fieldCases || [];
-        store.audit = data.auditEvents || [];
-        audit('backup','restore',`백업 복원 · 사례 ${store.cases.length}건`);
-        store.msg = {k:'ok',t:`복원 완료 · 사례 ${store.cases.length}건`};
-      }else{
-        store.msg = {k:'err',t:'인식할 수 없는 백업 형식입니다. 기존 데이터는 변경하지 않았습니다.'};
-      }
-    }catch(e){ store.msg = {k:'err',t:'파일을 읽을 수 없습니다. 기존 데이터는 변경하지 않았습니다.'}; }
-    paintAdmin();
-  };
-
-  const df = document.getElementById('df');
-  if(df) df.onchange = () => {
-    store.dbState = 'bad';
-    store.msg = {k:'err',t:'패키지 검증 실패 — schemaVersion / packageVersion 확인 필요. 기존 DB를 유지합니다.'};
-    audit('official-db','update-db','수동 가져오기 거부 — 검증 실패');
-    paintAdmin();
-  };
-
-  const pwf = document.getElementById('pwForm');
-  if(pwf) pwf.onsubmit = async e => {
-    e.preventDefault();
-    const cur = document.getElementById('cur').value;
-    const nw  = document.getElementById('nw').value;
-    const nw2 = document.getElementById('nw2').value;
-    if(await derive(cur, store.pwSalt) !== store.pwHash){
-      store.msg = {k:'err',t:'현재 비밀번호가 올바르지 않습니다.'}; return paintAdmin();
-    }
-    if(nw.length < 4){ store.msg={k:'err',t:'새 비밀번호는 4자 이상이어야 합니다.'}; return paintAdmin(); }
-    if(nw !== nw2){ store.msg={k:'err',t:'새 비밀번호 확인이 일치하지 않습니다.'}; return paintAdmin(); }
-    store.pwSalt = newSalt();
-    store.pwHash = await derive(nw, store.pwSalt);
-    audit('settings','change-password','관리자 비밀번호 변경');
-    store.msg = {k:'ok',t:'비밀번호를 변경했습니다. 이전 암호화 백업은 더 이상 복호화할 수 없습니다.'};
-    paintAdmin();
+  document.getElementById('pgClear').onclick = async () => {
+    if (!('caches' in window)) return;
+    await caches.delete('magicup-pages-v1');
+    store.msg = { k: 'ok', t: '저장된 원문 페이지를 삭제했습니다.' };
+    paintSettings();
   };
 }
 
-window.adminTab = i => { store.tab = i; store.editing = null; paintAdmin(); };
-window.adminLogout = () => { store.authed = false; store.editing = null; paintAdmin(); };
-window.newCase = () => {
-  store.editing = {id:uid(), alarmCode:(fam() && fam().alarms[0] ? fam().alarms[0].code : ''), title:'', symptom:'', actualCause:'',
-                   action:'', result:'', notes:'', createdAt:stamp(), updatedAt:stamp(), isNew:true};
-  paintAdmin();
-};
-window.editCase = id => { store.editing = {...store.cases.find(c=>c.id===id)}; paintAdmin(); };
-window.cancelCase = () => { store.editing = null; paintAdmin(); };
-window.rmPhoto = i => {
-  const id = store.editing.id;
-  store.photos[id] = (store.photos[id]||[]).filter((_,k)=>k!==i);
-  paintAdmin();
-};
-window.saveCase = () => {
-  const c = store.editing;
-  const parsed = fmt().parse(document.getElementById('e_code').value);
-  if(!parsed || parsed.isParent){
-    store.msg = {k:'err',t:'연결 에러코드 형식을 확인해 주세요. ' + fmt().errorText};
-    return paintAdmin();
-  }
-  const rec = {
-    id:c.id, alarmCode:parsed.display,
-    title:document.getElementById('e_title').value.trim(),
-    symptom:document.getElementById('e_sym').value.trim(),
-    actualCause:document.getElementById('e_cause').value.trim(),
-    action:document.getElementById('e_act').value.trim(),
-    result:document.getElementById('e_res').value.trim(),
-    notes:document.getElementById('e_note').value.trim(),
-    createdAt:c.createdAt, updatedAt:stamp()
-  };
-  if(c.isNew){ store.cases.push(rec); audit('field-case','create',`${rec.alarmCode} · ${rec.title||'(제목 없음)'}`); }
-  else{ store.cases = store.cases.map(x=>x.id===rec.id?rec:x);
-        audit('field-case','update',`${rec.alarmCode} · ${rec.title||'(제목 없음)'}`); }
-  store.editing = null;
-  store.msg = {k:'ok',t:'사례를 저장했습니다.'};
-  paintAdmin();
-};
-window.delCase = () => {
-  const c = store.editing;
-  store.cases = store.cases.filter(x=>x.id!==c.id);
-  delete store.photos[c.id];
-  audit('field-case','delete',`${c.alarmCode} · ${c.title||'(제목 없음)'}`);
-  store.editing = null;
-  store.msg = {k:'ok',t:'사례와 연결된 사진을 함께 삭제했습니다.'};
-  paintAdmin();
-};
-window.checkDb = () => {
-  store.lastCheck = stamp();
+/* 공식 DB 갱신 확인 — 프로토타입에서는 상태 표시만 한다 */
+function checkDb() {
   store.dbState = navigator.onLine ? 'cur' : 'off';
-  store.msg = {k:'info', t: navigator.onLine
-    ? '원격 version.json 확인 완료 — 로컬이 최신입니다.'
-    : '오프라인이라 최신 버전을 확인할 수 없습니다. 현재 로컬 DB를 유지합니다.'};
-  paintAdmin();
-};
-window.doBackup = async enc => {
-  const payload = {
-    format: enc ? 'mrj5-user-backup-encrypted' : 'mrj5-user-backup',
-    version:1, exportedAt:new Date().toISOString(),
-    fieldCases:store.cases,
-    photos:Object.entries(store.photos).flatMap(([cid,list])=>
-      list.map(p=>({fieldCaseId:cid,width:p.width,height:p.height,mimeType:p.mimeType,bytes:p.bytes}))),
-    auditEvents:store.audit,
-    settings:[]   // adminPasswordHash / adminPasswordSalt 는 제외
-  };
-  let text;
-  if(enc){
-    if(!hasCrypto){ store.msg={k:'err',t:'이 환경에서는 Web Crypto를 쓸 수 없어 암호화 백업을 만들 수 없습니다.'}; return paintAdmin(); }
-    text = JSON.stringify({
-      format:'mrj5-user-backup-encrypted', version:1, kdf:'PBKDF2-SHA-256', iterations:600000,
-      saltBase64:b64(store.pwSalt), cipher:'AES-GCM-256',
-      ivBase64:b64(crypto.getRandomValues(new Uint8Array(12))),
-      ciphertextBase64:'(프로토타입 — 실제 구현에서 AES-GCM 암호문이 들어갑니다)'
-    }, null, 2);
-  }else{
-    text = JSON.stringify(payload, null, 2);
-  }
-  const name = `mrj5-user-backup-${stamp().replace(/[-: ]/g,'')}${enc?'.enc':''}.json`;
-  try{
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([text],{type:'application/json'}));
-    a.download = name; a.click();
-  }catch(e){ /* file:// 환경에서 다운로드가 막히면 아래 미리보기로 대체 */ }
-  audit('backup', 'create', `${enc?'암호화':'일반 JSON'} 백업 · 사례 ${store.cases.length}건`);
-  paintAdmin();
-  const out = document.getElementById('bkout');
-  if(out) out.innerHTML = `<div class="hint" style="margin-top:16px">생성 파일: ${esc(name)}
-    (다운로드가 차단되는 환경에서는 아래 내용을 확인하세요)</div>
-    <div class="codeout">${esc(text.slice(0,1400))}${text.length>1400?'\n…':''}</div>`;
-};
+  store.msg = navigator.onLine
+    ? { k: 'ok', t: '최신 공식 DB를 사용 중입니다.' }
+    : { k: 'info', t: '오프라인입니다. 저장된 공식 DB를 그대로 사용합니다.' };
+  paintSettings();
+}
 
-document.getElementById('adminBtn').onclick = paintAdmin;
+window.checkDb = checkDb;
+document.getElementById('adminBtn').onclick = paintSettings;
+
 
 /* 첫 렌더 */
 paintHome();
