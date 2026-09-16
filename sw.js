@@ -1,11 +1,11 @@
 /* Magicup 에러코드 서비스워커
    설계 의도
    - 앱 껍데기와 텍스트(에러코드 전량)는 설치 즉시 오프라인 동작한다. 용량이 작다.
-   - 원문 페이지 이미지 513쪽(약 33MB)은 기본 설치에 포함하지 않는다.
-     현장에서 데이터로 33MB를 받게 하면 안 되기 때문이다.
-     본 사람 것만 자동으로 남기고, 관리자 화면의 '전체 내려받기'로 Wi-Fi 에서 한 번에 받는다.
+   - 원문 페이지 이미지 939쪽(약 66MB)은 기본 설치에 포함하지 않는다.
+     현장에서 데이터로 66MB를 받게 하면 안 되기 때문이다.
+     본 사람 것만 자동으로 남기고, 설정 화면의 '전체 내려받기'로 Wi-Fi 에서 한 번에 받는다.
 */
-const SHELL = 'magicup-shell-v1';
+const SHELL = 'magicup-shell-v2';
 const PAGES = 'magicup-pages-v1';
 const SHELL_FILES = ['./', './index.html', './manifest.webmanifest',
                      './icons/pwa-192.png', './icons/pwa-512.png'];
@@ -17,7 +17,7 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter((k) => k !== SHELL && k !== PAGES).map((k) => caches.delete(k)));
+    await Promise.all(keys.filter((k) => /^magicup-(shell|pages)-v\d+$/.test(k) && k !== SHELL && k !== PAGES).map((k) => caches.delete(k)));
     await self.clients.claim();
   })());
 });
@@ -56,7 +56,7 @@ self.addEventListener('fetch', (e) => {
   })());
 });
 
-/* 관리자 화면의 '원문 전체 내려받기' */
+/* 설정 화면의 '원문 전체 내려받기' */
 self.addEventListener('message', (e) => {
   if (e.data?.type !== 'PRECACHE_PAGES') return;
   const list = e.data.urls || [];

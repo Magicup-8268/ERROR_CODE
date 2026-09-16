@@ -576,7 +576,7 @@ footer{
     <div class="status-strip" style="padding-top:16px">
       <span class="pill"><i class="dot" id="netdot"></i><span id="nettext">온라인</span></span>
       <span class="pill" id="dbBadge">공식 DB</span>
-      <span class="pill">마지막 확인 · 오늘 08:12</span>
+      <span class="pill">최신 여부 · 미확인</span>
     </div>
 
     <div class="card">
@@ -726,17 +726,25 @@ const FORMATS = {
   'kinco-display': {
     label: 'XXX.X — 4자리 16진 Error Status Word (예: 002.0 = 0x0020)',
     placeholder: '표시값 입력 — 예: 002.0, 0x0020',
-    examples: ['002.0', '008.0', '020.0', '0x2000'],
+    examples: ['002.0', '000.3', '0x0030', '0x2000'],
+    isBitmask: true,
     errorText: '표시값 형식을 확인해 주세요.  예: 002.0 · 0020 · 0x0020',
     parse(input) {
       const s0 = nfkc(input);
       if (s0 === null) return null;
-      const hex = s0.replace(/^0X/, '').replace(/\./g, '');
+      if (!/^(?:0X[0-9A-F]{1,4}|[0-9A-F]{1,4}|[0-9A-F]{3}\.[0-9A-F])$/.test(s0)) return null;
+      const hex = s0.replace(/^0X/, '').replace('.', '');
       if (!/^[0-9A-F]{1,4}$/.test(hex)) return null;
       const h = hex.padStart(4, '0');
-      if (parseInt(h, 16) === 0) return null;
-      const code = `${h.slice(0, 3)}.${h.slice(3)}`;
-      return { display: code, codes: [code], isParent: false };
+      const value = parseInt(h, 16);
+      if (value === 0) return null;
+      const bits = range(0, 15).filter((bit) => value & (1 << bit));
+      const codes = bits.map((bit) => {
+        const mask = (1 << bit).toString(16).toUpperCase().padStart(4, '0');
+        return `${mask.slice(0, 3)}.${mask.slice(3)}`;
+      });
+      return { display: `${h.slice(0, 3)}.${h.slice(3)}`, codes,
+               isParent: false, bits, value, bitWidth: 16 };
     },
   },
 
@@ -3746,6 +3754,9 @@ const fmt = () => { const f = fam(); return f ? FORMATS[f.codeFormat] : null; };
 const famKey = () => `${mfr().id}:${fam() ? fam().id : '-'}`;
 
 function goHome() {
+  const query = $('#q').value;
+  paintHome();
+  $('#q').value = query;
   detail.classList.remove('on'); adminEl.classList.remove('on');
   home.classList.remove('off'); window.scrollTo({ top: 0 });
 }
@@ -3883,7 +3894,9 @@ function run(raw) {
 
   pushRecent(parsed.display);
 
-  if (format.isBitmask) return goDetail(renderBits(f, parsed));
+  // 킨코의 등록된 단일 비트는 기존 상세 화면으로, 복합·미정의 비트는 분해 결과로 보낸다.
+  if (format.isBitmask && !(f.codeFormat === 'kinco-display' && parsed.bits.length === 1
+      && f.alarms.some((a) => a.code === parsed.display))) return goDetail(renderBits(f, parsed));
 
   if (parsed.isParent) {
     /* anyClass: 구분 문자 없이 숫자만 입력한 경우 — 같은 번호의 모든 구분을 후보로 보여준다 */
@@ -3964,22 +3977,25 @@ function renderParent(code, children, anyClass) {
 /** 비트 플래그 결과 — 값 하나에 포함된 에러를 전부 나열한다 */
 function renderBits(f, parsed) {
   const allGroups = f.models.length;
-  const rows = parsed.bits.map((bit) => {
-    const hit = f.alarms.find((a) => a.bit === bit);
+  const isWord = f.codeFormat === 'kinco-display';
+  const hits = parsed.bits.map((bit, i) => f.alarms.find((a) =>
+    isWord ? a.code === parsed.codes[i] : a.bit === bit));
+  const rows = parsed.bits.map((bit, i) => {
+    const hit = hits[i];
     if (!hit) {
       return `<div class="child child-unknown">
           <span class="c1">Bit ${bit}</span>
-          <span class="c2">미사용 — 이 계열의 에러 검출 표에 정의돼 있지 않습니다</span></div>`;
+          <span class="c2">미정의 비트 — 현재 제품군 DB에 등록되지 않았습니다</span></div>`;
     }
     const partial = hit.models.length < allGroups;
-    return `<button class="child" onclick="run('${1 << bit}')">
-        <span class="c1">Bit ${bit}</span>
+    return `<button class="child" onclick="run('${isWord ? esc(hit.code) : 1 << bit}')">
+        <span class="c1">${isWord ? esc(hit.code) : `Bit ${bit}`}</span>
         <span class="c2">${esc(hit.title.ko)} · ${esc(hit.title.en)}
           ${partial ? `<span class="scope">${hit.models.map((m) => esc(m)).join(' / ')} 전용</span>` : ''}
         </span></button>`;
   }).join('');
 
-  const known = parsed.bits.filter((b) => f.alarms.some((a) => a.bit === b)).length;
+  const known = hits.filter(Boolean).length;
   const unused = parsed.bits.length - known;
 
   return `${backBtn}
@@ -3988,7 +4004,7 @@ function renderBits(f, parsed) {
     <div class="code-no">${esc(parsed.display)}</div>
     <div class="code-ko">이 값에 켜진 에러 ${known}건</div>
     <div class="code-en" style="font-style:normal">
-      ${parsed.bits.map((b) => `Bit ${b}`).join(' + ')} · 2진수 ${parsed.value.toString(2).padStart(8, '0')}</div>
+      ${parsed.bits.map((b) => `Bit ${b}`).join(' + ')} · 2진수 ${parsed.value.toString(2).padStart(parsed.bitWidth || 8, '0')}</div>
   </div>
   <div class="banner">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -3997,12 +4013,12 @@ function renderBits(f, parsed) {
     <span>${esc(f.notice)}</span>
   </div>
   <div class="childlist">${rows}</div>
-  ${unused ? `<div class="note">켜진 비트 ${parsed.bits.length}건 중 ${unused}건은 이 계열에 정의되지 않은 비트입니다.
+  ${unused ? `<div class="note">켜진 비트 ${parsed.bits.length}건 중 ${unused}건은 현재 제품군 DB에 등록되지 않은 비트입니다.
     사용 중인 모델의 계열을 다시 확인해 보세요.</div>` : ''}
   <div class="sec-label" style="margin-top:26px">이 제품군의 전체 비트</div>
   <div class="ptable">
     ${f.alarms.map((a) => `<div class="prow">
-      <div class="pno">Bit ${a.bit}</div>
+      <div class="pno">${isWord ? esc(a.code) : `Bit ${a.bit}`}</div>
       <div><div class="pds">${esc(a.title.ko)} · ${esc(a.title.en)}</div>
       <div class="pmd">${a.models.map((m) => `<span class="tag">${esc(m)}</span>`).join('')}</div></div>
     </div>`).join('')}
@@ -4451,7 +4467,7 @@ window.goHome = goHome; window.run = run; window.gotoTab = gotoTab;
       현장 사례 기능은 제거했다. 이 앱은 공식 자료 조회 전용이다.
       비밀번호도 두지 않는다. 지켜야 할 개인 데이터가 없기 때문이다.
    ============================================================ */
-const store = { dbState: 'cur', lastCheck: '오늘 08:12', msg: null };
+const store = { msg: null };
 
 function msgHtml() {
   if (!store.msg) return '';
@@ -4477,12 +4493,6 @@ async function savedPageCount() {
 }
 
 function renderSettings() {
-  const S = {
-    cur: ['cur', '최신 DB 사용 중'],
-    new: ['new', '새 공식 DB 사용 가능'],
-    off: ['off', '오프라인 · 현재 로컬 DB 유지'],
-    bad: ['bad', '업데이트 검증 실패 · 기존 DB 유지'],
-  }[store.dbState];
   const f = fam();
   const total = CATALOG.reduce((s, m) => s + (m.families || []).reduce((t, x) => t + (x.alarms || []).length, 0), 0);
 
@@ -4497,18 +4507,15 @@ function renderSettings() {
     ${msgHtml()}
 
     <div class="sec-label" style="margin-top:26px">공식 DB</div>
-    <div class="dbstate ${S[0]}"><i></i>${esc(S[1])}</div>
+    <div class="dbstate off"><i></i>내장 DB 사용 · 최신 여부 미확인</div>
     <div class="kv" style="margin-top:14px">
       <div class="kv-row"><div class="k">전체 등록 코드</div><div class="v"><b>${total.toLocaleString('ko-KR')}건</b></div></div>
       <div class="kv-row"><div class="k">현재 제품군</div><div class="v">${esc(f ? f.fullName : '-')}</div></div>
       <div class="kv-row"><div class="k">현재 버전</div><div class="v">${esc(f ? f.dbVersionLabel : '-')}</div></div>
-      <div class="kv-row"><div class="k">마지막 확인</div><div class="v">${esc(store.lastCheck)}</div></div>
+      <div class="kv-row"><div class="k">최신 확인</div><div class="v">미실시 — 자동 확인 기능 없음</div></div>
     </div>
-    <div class="btnrow">
-      <button class="btn btn-primary" onclick="checkDb()">최신 DB 확인</button>
-    </div>
-    <div class="hint">공식 데이터는 앱 안에서 수정할 수 없습니다.
-      검증에 실패한 패키지는 거부하고 기존 DB를 그대로 유지합니다.</div>
+    <div class="hint">이 앱에 포함된 공식 자료를 조회합니다. 제조사 자료의 최신 여부를 자동으로 확인하거나
+      DB를 갱신하는 기능은 없습니다. 자료별 출처와 확인일은 검색 결과의 <b>출처</b> 탭을 확인하십시오.</div>
 
     <div class="sec-label" style="margin-top:34px">원문 페이지 오프라인 저장</div>
     <div class="kv">
@@ -4549,16 +4556,6 @@ function paintSettings() {
   };
 }
 
-/* 공식 DB 갱신 확인 — 프로토타입에서는 상태 표시만 한다 */
-function checkDb() {
-  store.dbState = navigator.onLine ? 'cur' : 'off';
-  store.msg = navigator.onLine
-    ? { k: 'ok', t: '최신 공식 DB를 사용 중입니다.' }
-    : { k: 'info', t: '오프라인입니다. 저장된 공식 DB를 그대로 사용합니다.' };
-  paintSettings();
-}
-
-window.checkDb = checkDb;
 document.getElementById('adminBtn').onclick = paintSettings;
 
 
