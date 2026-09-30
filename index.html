@@ -765,23 +765,36 @@ const FORMATS = {
     },
   },
 
-  /* FASTECH Ezi-SERVO — 알람은 빨간 LED 점멸 횟수로 표시된다.
-     점멸 횟수와 알람의 대응표를 공개 자료에서 확인하지 못해,
-     숫자 입력은 '후보 목록' 화면으로 보낸다. 이름 입력은 직접 조회한다. */
+  /* FASTECH — 접두사 없는 숫자는 점멸 횟수(10진수), 0x 접두사는 RS-485 알람값(16진수). */
   'fastech-alarm': {
-    label: '점멸 횟수 = 알람 번호. 숫자 또는 E-0xx 로 입력',
-    placeholder: '점멸 횟수 또는 코드 — 예: 3, E-003',
-    examples: ['3', 'E-004', '15', '7'],
-    errorText: '점멸 횟수(1~99) 또는 E-0xx 형식으로 입력해 주세요.  예: 3 · E-003',
+    label: '점멸 횟수·E-0xx 또는 RS-485 알람값(0x00~0xFF)',
+    placeholder: '예: 3, E-003, 0x03, 0x0A',
+    examples: ['0x03', '0x0A', 'E-004', '15'],
+    errorText: '점멸 횟수, E-0xx 또는 0x로 시작하는 1바이트 16진수를 입력해 주세요.',
     parse(input) {
       const s0 = nfkc(input);
       if (s0 === null) return null;
-      const m = /^(?:E[.\-_]?)?([0-9]{1,3})$/.exec(s0);
-      if (!m) return null;
-      const n = parseInt(m[1], 10);
+      const hex = /^0X([0-9A-F]{1,2})$/.exec(s0);
+      const decimal = hex ? null : /^(?:E[.\-_]?)?([0-9]{1,3})$/.exec(s0);
+      if (!hex && !decimal) return null;
+      const n = hex ? parseInt(hex[1], 16) : parseInt(decimal[1], 10);
+      if (hex && n === 0) return { display: '0x00', codes: [], noAlarm: true };
       if (n < 1 || n > 999) return null;
-      return { display: `E-${String(n).padStart(3, '0')}`, codes: [`E-${String(n).padStart(3, '0')}`],
+      return { display: hex ? `0x${hex[1].padStart(2, '0')}` : `E-${String(n).padStart(3, '0')}`,
+               codes: [`E-${String(n).padStart(3, '0')}`],
                isParent: false, blink: n };
+    },
+  },
+  'fastech-comm-hex': {
+    label: 'RS-485 응답 첫째 바이트 — 통신 상태 16진수',
+    placeholder: '통신 상태값 — 예: 0x80, 0xAA',
+    examples: ['0x00', '0x80', '0x82', '0xAA'],
+    errorText: '1바이트 16진수로 입력해 주세요. 예: 0x80, AA',
+    parse(input) {
+      const m = /^(?:0X)?([0-9A-F]{1,2})$/.exec(nfkc(input) || '');
+      if (!m) return null;
+      const code = `0x${m[1].padStart(2, '0')}`;
+      return { display: code, codes: [code], isParent: false };
     },
   },
 
@@ -3633,6 +3646,104 @@ CATALOG.find(m => m.id === 'fastech').families[0].models=['Ezi-SERVO ALL-28','Ez
 for (const a of CATALOG.find(m => m.id === 'fastech').families[0].alarms) a.source.note='공식 ALL 제품군 웹 표 3종 대조. 다른 제품군에 동일하게 적용한다고 단정하지 않습니다.';
 CATALOG.find(m=>m.id==='fastech').families[0].alarms.find(a=>a.code==='E-005').triggerCondition='ALL-28: 드라이브 내부 이상 고온. ALL-42/56 및 ALL-60: 내부 온도 85℃ 초과. 해당 모델의 표시 방식으로 5회 점멸합니다.';
 for (const a of CATALOG.find(m=>m.id==='fastech').families[0].alarms) a.triggerCondition=a.triggerCondition.replace('180°(기종에 따라 90°)','180°');
+/* FASTECH 공식 Ezi-SERVO ALL 한글 매뉴얼: 본문편 91·93쪽, 통신 기능편 12·18~19쪽. */
+const fastech = CATALOG.find(m => m.id === 'fastech');
+const allFamily = fastech.families[0];
+const fastechManualUrl = 'https://fastech-motions.com/new/board/bbs/download_product.php?bo_table=sub010206&wr_id=0';
+const fastechManualZip = 'https://fastech-motions.com/new/board/bbs/download.php?bo_table=sub0302&no=0&wr_id=512';
+const fastechAlarmChecks = {
+  1: ['모터 선(A, /A, B, /B)의 단락 상태를 확인합니다.', '파라미터 설정과 기계의 부하 상태를 확인합니다.'],
+  2: ['파라미터 설정과 모터의 이상 동작을 확인합니다.', '상위 제어기(PLC 등)의 속도 지령을 확인합니다.'],
+  3: ['부하를 줄이거나 가감속 값을 증가시킵니다.', '기구부의 조립 상태를 점검합니다.', '브레이크 케이블을 점검합니다.', '모터 선의 쇼트 또는 단선을 점검합니다.', '엔코더 케이블 배선 상태를 점검합니다.', '파라미터 27(Position Tracking Limit) 설정값을 점검합니다.'],
+  4: ['모터 정격과 부하의 크기를 비교합니다.', '기구부의 조립 상태를 점검합니다.', '파라미터의 SW limit 값을 확인합니다.', '센서의 정상 동작을 확인합니다.', '모터와 드라이브의 모터 DB가 일치하는지 확인합니다.', '모터 선의 쇼트 또는 단선을 점검합니다.'],
+  5: ['주위 온도를 낮추거나 냉각팬을 설치합니다.', '드라이브 사이의 간격이 50 mm 이상인지 확인합니다.'],
+  6: ['고속 운전 시 가감속 값이 작지 않은지 확인합니다.'],
+  7: ['드라이브와 모터의 연결 상태를 확인합니다.'],
+  8: ['드라이브와 엔코더의 연결 상태를 확인합니다.', '엔코더 파손, 고정 나사 풀림, 엔코더 선 단선을 확인합니다.'],
+  9: ['드라이브 공급 전원을 확인합니다.', '드라이브 공급 전원 케이블의 길이와 굵기를 확인합니다.'],
+  10: ['파라미터 설정과 과부하 여부를 확인합니다.', '기구부 진동과 벨트 장력을 확인합니다.', '모터 및 엔코더 배선 상태를 확인합니다.'],
+  11: ['드라이브 공급 전원의 전류가 충분한지 확인합니다.'],
+  12: ['드라이브 공급 전원의 전류가 충분한지 확인합니다.'],
+  15: ['부하를 줄이거나 가감속 값을 증가시킵니다.', '브레이크와 엔코더의 정상 동작 여부를 확인합니다.'],
+};
+for (const [n, ko, en, condition] of [
+  [9, '모터 전압 이상', 'Motor Power Error', '모터 공급 전원이 하한값 이하인 경우. 통합 매뉴얼은 ALL 시리즈의 하한값을 20 V로 기재합니다.'],
+  [11, '시스템 이상', 'System Error', '드라이브 시스템 이상(Watch Dog Timer).'],
+]) {
+  allFamily.alarms.push({
+    code: `E-${String(n).padStart(3, '0')}`, blink: n, title: { ko, en },
+    models: ['Ezi-SERVO ALL 통합 매뉴얼 · 세부 모델 확인 필요'], triggerCondition: condition,
+    causes: [], parameters: [], recoveryNotes: [], fieldGuide: { diagnosticOrder: [], caution: '' },
+    source: { documentTitle: 'FASTECH Ezi-SERVO ALL 사용자 매뉴얼 — 본문편 Ver.4',
+      section: '1.5 배선 · 1.7 보수 및 점검 · 9.1 알람의 종류 · 9.3 알람의 진단과 해제', printedPage: '8·91·93쪽',
+      language: '한글 원문', publisher: '파스텍 FASTECH', url: fastechManualUrl,
+      extraLinks: [{ label: '원문 ZIP 직접 다운로드', href: fastechManualZip }],
+      urlLabel: '공식 매뉴얼 다운로드 페이지', publicationDate: '공식 다운로드 확인 2026-09-30',
+      note: '통합 사용자 매뉴얼에는 수록됐으나 ALL-28·42/56·60 제품별 공식 웹 알람표에는 없습니다. 세부 모델 적용 여부를 확인하십시오.' },
+  });
+}
+allFamily.alarms.sort((a, b) => a.blink - b.blink);
+allFamily.dbVersionLabel = 'FASTECH-EZI-KO-003';
+allFamily.lede = '적색 LED 점멸 횟수, E-0xx 또는 RS-485 알람값으로 검색';
+allFamily.notice = 'RS-485 알람 조회(명령 0x2E) 응답의 첫째 바이트는 통신 상태, 둘째 바이트는 모터 알람값입니다. 0x0A는 E-010입니다. 9·11번은 통합 매뉴얼에 있으나 ALL 제품별 웹 표에는 없습니다. 13·14번은 미정의입니다.';
+allFamily.extraNote = '공식 ALL 제품별 웹 표는 11건, Ezi-SERVO ALL 통합 사용자 매뉴얼은 9·11번을 포함한 13건을 수록합니다. 9·11번은 세부 모델 적용 여부를 확인하십시오.';
+for (const a of allFamily.alarms) {
+  const n = Number(a.code.slice(2));
+  a.overviewRows = [...(a.overviewRows || []), { k: 'RS-485 알람값', v: `0x${n.toString(16).toUpperCase().padStart(2, '0')}` }];
+  if (n === 9 || n === 11) a.overviewRows.push({ k: '적용 범위', v: '통합 매뉴얼 수록 · ALL 제품별 웹 표 미기재 · 세부 모델 확인 필요' });
+  a.officialLists = [{ title: '공식 점검 내용 — 한글 사용자 매뉴얼 93쪽', kind: 'step', items: fastechAlarmChecks[n] }];
+  a.recoveryNotes = [[1, 2, 3, 4, 5, 6, 10, 15].includes(n)
+    ? '공식 매뉴얼: 리셋 유효. 발생 원인을 제거한 뒤 알람을 해제하십시오.'
+    : '공식 매뉴얼: 리셋 무효. 발생 원인을 제거한 뒤 전원을 일단 차단해야 해제됩니다.'];
+  a.recoveryNotes.push('배선·보수 점검은 전원을 차단하고 충분히 기다린 뒤 수행하십시오. 통전 중 배선을 변경하지 마십시오. (본문편 8쪽)');
+  if (n !== 9 && n !== 11) {
+    a.source.documentTitle = 'FASTECH Ezi-SERVO ALL 사용자 매뉴얼 — 본문편 Ver.4';
+    a.source.section = '1.5 배선 · 1.7 보수 및 점검 · 9.1 알람의 종류 · 9.3 알람의 진단과 해제';
+    a.source.printedPage = '8·91·93쪽';
+    a.source.publicationDate = '공식 다운로드 확인 2026-09-30';
+    a.source.extraLinks = [{ label: '공식 한글 매뉴얼 다운로드 페이지', href: fastechManualUrl },
+      { label: '원문 ZIP 직접 다운로드', href: fastechManualZip }];
+    a.source.note = '발생 조건은 ALL 제품별 공식 웹 표, 점검·리셋 여부는 공식 한글 사용자 매뉴얼 93쪽을 대조했습니다.';
+  }
+}
+const fastechCommSource = {
+  documentTitle: 'FASTECH Ezi-SERVO ALL 사용자 매뉴얼 — 통신 기능편 Ver.4',
+  section: '2.1.4 응답 Frame 구성 및 통신 에러 · 2.2 Frame의 구성',
+  printedPage: '12·18~19쪽', language: '한글 원문', publisher: '파스텍 FASTECH',
+  url: fastechManualUrl, urlLabel: '공식 한글 매뉴얼 다운로드 페이지',
+  extraLinks: [{ label: '원문 ZIP 직접 다운로드', href: fastechManualZip }],
+  publicationDate: '공식 다운로드 확인 2026-09-30',
+  note: '통신 상태값·원인은 공식 매뉴얼 12쪽, 0x2E 조회 응답 구조는 18~19쪽. 현장 점검 탭은 원문 조건에서 확인 대상을 추린 것이며 제조사가 별도로 제시한 수리 절차는 아닙니다.',
+};
+const fastechCommRows = [
+  ['00', '통신 정상', '통신이 정상 상태입니다.', ['별도 통신 오류 점검 대상이 아닙니다.']],
+  ['80', 'Frame type 에러', '수신한 Frame type 명령을 인식할 수 없습니다.', ['송신한 Frame type 값이 해당 통신 매뉴얼의 지원 명령인지 대조합니다.']],
+  ['81', '데이터·ROM 읽기/쓰기 에러', '수신한 데이터값이 정해진 범위를 벗어났거나 ROM 데이터 읽기·쓰기 오류입니다.', ['송신 데이터값이 매뉴얼의 허용 범위에 있는지 확인합니다.', 'ROM 읽기·쓰기 명령의 결과를 확인합니다.']],
+  ['82', '수신 Frame 에러', '수신된 Frame이 통신 규격에 맞지 않습니다.', ['송신 Frame의 구성과 데이터 길이를 통신 매뉴얼과 대조합니다.']],
+  ['85', '운전 명령 실패', '모터 운전 중, 정지 명령 중, Servo OFF, 외부 엔코더 없는 Z-pulse 원점복귀 시도, 그 밖의 잘못된 운전 명령에서 발생합니다.', ['모터가 운전 중이거나 정지 명령 처리 중인지 확인합니다.', 'Servo OFF 상태인지 확인합니다.', 'Z-pulse 원점복귀에 필요한 외부 엔코더와 명령 조건을 확인합니다.']],
+  ['86', 'RESET 실패', 'Servo ON 상태이거나 외부 입력 신호로 이미 Reset 상태일 때 발생합니다.', ['Servo ON 상태와 외부 입력의 Reset 상태를 확인합니다.']],
+  ['87', 'Servo ON 실패 ①', '알람 발생 중에 Servo ON 명령을 실행하려고 했습니다.', ['현재 발생한 모터 알람값을 먼저 조회합니다.']],
+  ['88', 'Servo ON 실패 ②', '비상 정지 중에 Servo ON 명령을 실행하려고 했습니다.', ['비상 정지 상태를 확인합니다.']],
+  ['89', 'Servo ON 실패 ③', '외부 입력 신호에 ServoON이 설정되어 있어 그 입력으로만 Servo ON/OFF를 실행할 수 있습니다.', ['ServoON 기능의 외부 입력 할당 여부를 확인합니다.']],
+  ['8A', 'Servo OFF 실패', 'Servo ON 명령에 따른 Servo ON 과정이 진행 중일 때 Servo OFF를 실행하려고 했습니다.', ['Servo ON 처리 중인지 확인합니다.']],
+  ['AA', 'CRC 에러', '수신 Frame 데이터에 노이즈 등의 영향으로 CRC 오류가 발생했습니다. 송신측 DLL은 자동으로 한 번 더 시도합니다.', ['수신 Frame의 CRC와 통신선의 노이즈 영향을 확인합니다.', '제조사 DLL의 1회 자동 재시도 후에도 오류가 반복되는지 확인합니다.']],
+];
+fastech.families.push({
+  id: 'ezi-servo-rs485-status', ko: '통신 상태', en: 'RS-485',
+  fullName: 'FASTECH Ezi-SERVO ALL RS-485 응답 상태', codeFormat: 'fastech-comm-hex',
+  dbVersionLabel: 'FASTECH-RS485-KO-001', headline: ['첫째 바이트는', '통신 상태.'],
+  lede: '응답 첫째 바이트의 통신 상태값을 16진수로 검색',
+  notice: '알람 조회 명령 0x2E의 응답은 통신 상태 1바이트 + 모터 알람 1바이트입니다. 0xAA는 통신 상태 필드에서는 CRC 오류이며, 전체 Frame의 구분 바이트와 혼동하지 마십시오.',
+  models: allFamily.models.slice(), dataStatus: null,
+  alarms: fastechCommRows.map(([hex, ko, desc, checks]) => ({
+    code: `0x${hex}`, title: { ko, en: '' }, models: allFamily.models.slice(),
+    triggerCondition: desc, causes: [], parameters: [], recoveryNotes: [],
+    officialLists: [{ title: '공식 통신 상태 설명 — 통신 기능편 12쪽', kind: 'list', items: [desc] }],
+    fieldGuide: { diagnosticOrder: checks,
+      caution: '이 점검 항목은 공식 매뉴얼의 통신 상태 정의에서 확인 대상을 추린 것입니다. 별도의 제조사 수리 절차로 제시된 내용은 아닙니다.', kind: 'inferred' },
+    source: { ...fastechCommSource },
+  })),
+});
 for (const f of CATALOG.find(m=>m.id==='kinco').families) {f.dataStatus={title:'최신 공개판 본문 대조 미완료',body:'2026-09-22 공식 MD 페이지에서 2026-07-21 매뉴얼의 공개 링크를 확인했습니다. 다운로드 응답이 검증용 웹 페이지로 돌아와 본문을 확보하지 못했습니다. 현재 25개 비트 정의는 기존 수록 자료입니다.',todo:['최신 매뉴얼 본문 확보 후 코드·원인·조치 대조']}; for(const a of f.alarms) a.source.note+=' · 2026-09-22 최신 공개판 링크 확인, 본문 대조 미완료';}
 
 /* Hi5 전용 XML — Hi5a 및 Hi6/Hi7 공용 DB와 구분한다. */
@@ -3844,6 +3955,9 @@ function run(raw) {
   // 모든 비트 형식의 등록된 단일 항목은 상세 화면으로 연결한다.
   if (format.isBitmask && !(parsed.bits.length === 1
       && f.alarms.some((a) => a.code === parsed.codes[0]))) return goDetail(renderBits(f, parsed));
+  if (parsed.noAlarm) return goDetail(`${backBtn}<div class="code-head">
+    <div class="code-no">0x00</div><div class="code-ko">모터 알람 없음</div>
+    <p>RS-485 알람 조회 응답의 두 번째 바이트가 0x00입니다. 첫 번째 통신 상태값도 확인하십시오.</p></div>`);
   const status = parsed.alert
     ? `<div class="banner">입력 ${esc(parsed.display)} · Alert(Bit 7)가 켜져 있습니다. 통신 에러 번호와 별도로 해당 모델의 Hardware Error Status를 확인하십시오.</div>` : '';
   if (parsed.noError) return goDetail(`${backBtn}${status}<div class="code-head"><div class="code-no">${esc(parsed.display)}</div><div class="code-ko">하위 7비트 에러 번호 없음</div><p>이 값만으로 장치 전체의 정상 여부를 판단하지 마십시오.</p></div>`);

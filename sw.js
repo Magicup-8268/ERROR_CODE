@@ -4,7 +4,7 @@
    - 원문 이미지는 기본 설치에 포함하지 않는다.
      본 쪽만 자동 저장하고 설정에서 제품군 또는 전체 범위를 선택한다.
 */
-const SHELL = 'magicup-shell-v4';
+const SHELL = 'magicup-shell-v5';
 const PAGES = 'magicup-pages-v1';
 const SHELL_FILES = ['./index.html', './manifest.webmanifest',
                      './icons/pwa-192.png', './icons/pwa-512.png'];
